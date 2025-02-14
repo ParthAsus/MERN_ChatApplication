@@ -21,6 +21,18 @@ const UserSchema = mongoose.Schema(
       type:String,
       default: '',
     },
+    phoneNumber:{
+      type: String,
+      required: true,
+      minlength: 10,
+      unique: true
+    },
+    contacts:[
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
   },
   {
     timestamps: true,

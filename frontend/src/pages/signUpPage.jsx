@@ -7,6 +7,7 @@ import {
   Lock,
   Mail,
   MessageSquare,
+  Phone,
   User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -19,6 +20,7 @@ const SignUpPage = () => {
     fullName: "",
     email: "",
     password: "",
+    phoneNumber: "",
   });
 
   const { signup, isSigningUp } = useAuthStore();
@@ -26,10 +28,12 @@ const SignUpPage = () => {
   const validateForm = () => {
     if (!formData.fullName.trim()) return toast.error("Full name is required");
     if (!formData.email.trim()) return toast.error("Email is required");
+    if(!formData.phoneNumber.trim()) return toast.error("Phone Number is required");
+    if(!/^\d+$/.test(formData.phoneNumber)) return toast.error("Phone Number should contain only numbers");
+    if(formData.phoneNumber.length !== 10) return toast.error("Phone Number must be 10 digits");
     if (!/\S+@\S+\.\S+/.test(formData.email)) return toast.error("Invalid email format");
     if (!formData.password) return toast.error("Password is required");
     if (formData.password.length < 6) return toast.error("Password must be at least 6 characters");
-
     return true;
   };
 
@@ -100,6 +104,27 @@ const SignUpPage = () => {
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+
+            
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">PhoneNumber</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Phone className="size-5 text-base-content/40" />
+                </div>
+                <input
+                  type="text"
+                  className={`input input-bordered w-full pl-10`}
+                  placeholder="0987654321"
+                  value={formData.phoneNumber}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phoneNumber: e.target.value })
                   }
                 />
               </div>

@@ -9,6 +9,7 @@ export const useAuthStore = create((set, get) => ({
   authUser: null,
   isSigningUp: false,
   isLogingIn: false,
+  isAddingUser: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
   onlineUsers: [],
@@ -79,6 +80,18 @@ export const useAuthStore = create((set, get) => ({
       toast.error(error.response.data.message);
     }finally{
       set({isUpdatingProfile: false});
+    }
+  },
+
+  addContactInUser: async (userId) => {
+    set({isAddingUser: true});
+    try{
+      const res = await axiosInstance.post('/auth/add-contact', {userId});
+      toast.success(res.data.message);
+    }catch(error){
+      toast.error(error.response.data.message);
+    }finally{
+      set({isAddingUser: false});
     }
   },
   

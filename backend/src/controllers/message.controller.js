@@ -6,17 +6,29 @@ import user from "../models/user.model.js";
 export const getUserForSidebar = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
-    const filteredUsers = await user.find(
-      {
-        _id: {
-          $ne: loggedInUserId
-        }
-      }
-    ).select("-password");
+    const filteredUsers = await user.findById(loggedInUserId).populate('contacts', "-password");
+    if(!filteredUsers){
+      return res.status(404).json({message: "User not found"});
+    }
 
     res.status(200).json(filteredUsers);
   } catch (error) {
     console.log('Error in getUserForSidebar: ', error);
+    res.status(500).json({error: "Internal Server Error"});
+  }
+}
+
+export const searchUserForSidebar = async (req, res) => {
+  try{
+    const {phone} = req.query;
+    if(!phone) return res.status(400).json({message: 'Phone Number is Required'});
+
+    const existingUser = await user.findOne({phoneNumber: phone}).select('_id fullName profilePic')
+    if(!existingUser) return res.status(404).json({message: 'User not found'});
+
+    res.status(200).json(existingUser);
+  }catch(error){
+    console.log('Error in searchUserForSidebar: ', error);
     res.status(500).json({error: "Internal Server Error"});
   }
 }

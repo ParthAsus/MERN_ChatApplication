@@ -4,17 +4,29 @@ import user from "../models/user.model.js";
 import bcrypt from 'bcryptjs'; 
 
 export const signup = async (req, res) => {
-  const {email, fullName, password} = req.body;
+  const {email, fullName, password, phoneNumber} = req.body;
 
   try {
 
-    if(!email || !fullName || !password) return res.status(400).json({message: 'All fields are required'});
+    if(!email || !fullName || !password || !phoneNumber) return res.status(400).json({message: 'All fields are required'});
     if(password.length < 6){
       return res.status(400).json({message: 'Password must be at least 6 characters'});
     }
 
+    if(phoneNumber.length !== 10){
+      return res.status(400).json({message: 'PhoneNumber must be at least 10 Numbers'});
+    }
+
+    if (!/^\d+$/.test(phoneNumber)){
+      return res.status(400).json({message: 'PhoneNumber must contains only number'});;
+    } 
+
+
     const existingUser = await user.findOne({email: email});
     if(existingUser) return res.status(400).json({message: 'Email already exists'});
+
+    const existingPhoneNumber = await user.findOne({phoneNumber: phoneNumber});
+    if(existingPhoneNumber) return res.status(400).json({message: 'PhoneNumber already exists'});
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -22,7 +34,8 @@ export const signup = async (req, res) => {
     const newUser = new user({
       email,
       fullName,
-      password: hashedPassword
+      password: hashedPassword,
+      phoneNumber
     });
 
     if(newUser){
@@ -33,6 +46,7 @@ export const signup = async (req, res) => {
         _id: newUser._id,
         email: newUser.email,
         fullName: newUser.fullName,
+        phoneNumber: newUser.phoneNumber,
         profilePic: newUser.profilePic,
         createdAt: newUser.createdAt,
       });
@@ -104,6 +118,33 @@ export const updateProfile = async (req, res) => {
   } catch (error) {
     console.error('Error in Update Profile Controller', error);
     return res.status(500).json({message: 'Internal Server Error'});
+  }
+}
+
+export const addContactInUser = async (req, res) => {
+  try{
+    const myId = req.user._id;
+    const {userId: userToAdd} = req.body; 
+
+    if(!userToAdd){
+      return res.status(400).json({message: 'User ID is required'});
+    }
+
+    if(userToAdd == myId) return res.status(400).json({message: 'You can not add yourself'});
+
+    const loggedInUserId = await user.findById(myId).select('contacts');
+    const senderId = await user.findById(userToAdd).select('contacts');
+
+    if(!loggedInUserId || !senderId) return res.status(404).json({message: 'User not found'});
+
+    await user.updateOne({ _id: myId }, { $addToSet: { contacts: userToAdd } });
+    await user.updateOne({ _id: userToAdd }, { $addToSet: { contacts: myId } });
+
+    res.status(200).json({ message: "Contact added successfully" });
+
+  }catch(error){
+    console.log('Error in addContactInUser: ', error);
+    res.status(500).json({error: "Internal Server Error"});
   }
 }
 
