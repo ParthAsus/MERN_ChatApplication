@@ -40,7 +40,7 @@ const Sidebar = () => {
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-blue-500 text-white p-2 rounded-md mx-4 my-3"
+          className=" p-2 rounded-md mx-4 my-3"
         >
           + Add Member
         </button>
@@ -85,17 +85,17 @@ const Sidebar = () => {
 
       {/* Modal for Adding Users */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-md w-96">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
+          <div className="bg-neutral p-6 rounded-md w-96">
             <h2 className="text-xl font-semibold mb-4">Add Member</h2>
             <input
               type="text"
               placeholder="Enter phone number"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full border p-2 rounded-md"
+              className="w-full border p-2 rounded-md bg-neutral"
             />
-            <button onClick={handleSearchUser} className="bg-blue-500 text-white p-2 rounded-md mt-3 w-full">
+            <button onClick={handleSearchUser} className=" bg-primary text-neutral p-2 rounded-md mt-3 w-full hover:opacity-70">
               Search
             </button>
 
@@ -113,9 +113,9 @@ const Sidebar = () => {
               </div>
             )}
 
-            {!searchedUser && <p className="text-center mt-3 text-red-500">User not found</p>}
+            {!searchedUser && <p className="text-center mt-3 ">Add now to chat with your friends...</p>}
 
-            <button onClick={() => setIsModalOpen(false)} className="text-gray-500 mt-4 w-full">
+            <button onClick={() => setIsModalOpen(false)} className="bg-secondary text-neutral hover:opacity-70 mt-4 text-center py-2  w-full rounded-md">
               Close
             </button>
           </div>
