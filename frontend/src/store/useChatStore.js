@@ -2,6 +2,7 @@ import {create} from 'zustand';
 import { axiosInstance } from '../lib/axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from './useAuthStore';
+import { fetchGifs } from '../lib/giphy';
 
 export const useChatStore = create((set, get) => ({
   messages: [],
@@ -10,6 +11,9 @@ export const useChatStore = create((set, get) => ({
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
+  gifUrls: [],
+  isGifSelected: false,
+  selectedGif: null, 
 
   getUsers: async () => {
     set({isUsersLoading: true});
@@ -77,5 +81,18 @@ export const useChatStore = create((set, get) => ({
     socket.off("message");
   },
 
+  getFetchGifs: async (query) => {
+    try{
+      const gifUrls = query ? await fetchGifs(query) : await fetchGifs();
+      set({gifUrls: gifUrls});
+    }catch(error){
+      toast.error(error.message);
+    }
+  },
+
   setSelectedUser: (selectedUser) => set({selectedUser}),
+
+  setSelectedGif: (selectedGif) => set({isGifSelected: true, selectedGif: selectedGif}),
+
+  clearSelectedGif: () => set({isGifSelected: false, selectedGif: null}),
 }));
