@@ -1,6 +1,7 @@
 import express from 'express';
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
+import groupRoutes from './routes/group.route.js';
 import dotenv from 'dotenv';
 import {connectDb} from './lib/db.js';
 import cookieParser from 'cookie-parser';
@@ -22,6 +23,8 @@ app.use(express.urlencoded({extended: true}));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/groups", groupRoutes);
+
 
 
 

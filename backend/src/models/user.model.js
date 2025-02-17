@@ -33,6 +33,10 @@ const UserSchema = mongoose.Schema(
         ref: 'User'
       }
     ],
+    groups: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Group'
+    }]
   },
   {
     timestamps: true,

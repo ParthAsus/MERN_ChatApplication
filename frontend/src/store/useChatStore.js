@@ -13,7 +13,10 @@ export const useChatStore = create((set, get) => ({
   isMessagesLoading: false,
   gifUrls: [],
   isGifSelected: false,
-  selectedGif: null, 
+  selectedGif: null,
+  groups: [],
+  isGroupsLoading: false,
+  isGroupCreating: false,
 
   getUsers: async () => {
     set({isUsersLoading: true});
@@ -24,6 +27,32 @@ export const useChatStore = create((set, get) => ({
       toast.error(error.response.data.message);
     } finally{
       set({isUsersLoading: false});
+    }
+  },
+
+  getGroups: async () => {
+    try {
+      set({isGroupsLoading: true});
+      const res = await axiosInstance.get('/groups/get-groups');
+      set({groups: res.data.groups});
+    } catch (error) {
+      toast.error(error.response.data.message);
+      set({isGroupsLoading: false});
+    }finally{
+      set({isGroupsLoading: false});
+    }
+  },
+
+  createGroup: async (group) => {
+    try {
+      set({isGroupCreating: true});
+      const res = await axiosInstance.post("/groups/create-group", group);
+      toast.success(res.data.message);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      set({isGroupCreating: false});
+    }finally{
+      set({isGroupCreating: false});
     }
   },
 

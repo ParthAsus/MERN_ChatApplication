@@ -1,8 +1,8 @@
-import expres from 'express';
+import express from 'express';
 import { addContactInUser, checkAuth, login, logout, signup, updateProfile } from '../controllers/auth.controller.js';
 import { protectRoute } from '../middleware/auth.middleware.js';
 
-const router = expres.Router();
+const router = express.Router();
 
 router.post('/signup', signup);
 

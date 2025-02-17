@@ -18,6 +18,7 @@ const ChatHeader = () => {
     setShowProfileModal((prev) => !prev);
   }
 
+  console.log(selectedUser);
   
   return (
     <div className="p-2.5 border-b border-base-300">
@@ -25,7 +26,7 @@ const ChatHeader = () => {
       <div className="flex items-center gap-3 relative">
           <div className="avatar relative" onClick={handleProfileModal}>
             <div className="size-10 rounded-full cursor-pointer">
-              <img src={selectedUser.profilePic || "/avatar.jpg"} alt={selectedUser.fullName} />
+              <img src={selectedUser.profilePic || "/avatar.jpg"} alt={selectedUser.fullName || selectedUser.groupName} />
             </div>
 
             {showProfileModal && (
@@ -37,7 +38,7 @@ const ChatHeader = () => {
 
           {/* User info */}
           <div>
-            <h3 className="font-medium">{selectedUser.fullName}</h3>
+            <h3 className="font-medium">{selectedUser.fullName || selectedUser.groupName}</h3>
             <p className="text-sm text-base-content/70">
               {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
             </p>
@@ -49,13 +50,6 @@ const ChatHeader = () => {
           <X/>
         </button>
       </div>
-{/* 
-      {showProfileModal && (
-        <div className="top-12 left-0 w-64 bg-base-100 shadow-lg rounded-lg z-20">
-          <ProfileModal />
-        </div>
-      )} */}
-
     </div>
   )
 }
