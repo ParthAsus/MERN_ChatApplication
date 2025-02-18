@@ -24,6 +24,15 @@ const ChatContainer = () => {
     }
   }, [messages]);
 
+  const getSenderProfilePic = (message) => {
+    if(selectedUser.members){
+      const sender = selectedUser.members.find(member => member._id === message.senderId);
+      return sender ? sender.profilePic : "/avatar.jpg";
+    }
+
+    return message.senderId === authUser._id ? authUser.profilePic || "/avatar.jpg" : selectedUser.profilePic || selectedUser.groupProfilePic || "/avatar.jpg"
+  };
+
   if (isMessagesLoading) {
     return (
       <div className="flex-1 flex flex-col overflow-auto">
@@ -33,6 +42,7 @@ const ChatContainer = () => {
       </div>
     );
   }
+
 
   return (
     <div className="flex-1 flex flex-col overflow-auto">
@@ -50,9 +60,7 @@ const ChatContainer = () => {
               <div className="size-10 rounded-full border">
                 <img
                   src={
-                    message.senderId === authUser._id
-                      ? authUser.profilePic || "/avatar.jpg"
-                      : selectedUser.profilePic || "/avatar.jpg"
+                    getSenderProfilePic(message)
                   }
                   alt="profile pic"
                 />

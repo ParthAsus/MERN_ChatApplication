@@ -12,7 +12,7 @@ const MessageInput = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
-  const { sendMessage, getFetchGifs, gifUrls, selectedGif, isGifSelected, clearSelectedGif } = useChatStore();
+  const { sendMessage, getFetchGifs, gifUrls, selectedGif, isGifSelected, clearSelectedGif, selectedUser } = useChatStore();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef(null);
   const [showGifPicker, setShowGifPicker] = useState(false);
@@ -54,7 +54,6 @@ const MessageInput = () => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    console.log(selectedGif);
     if (!text.trim() && !imagePreview && !isGifSelected) return;
     setLoading(true);
     try {

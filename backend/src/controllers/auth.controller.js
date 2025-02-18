@@ -36,7 +36,7 @@ export const signup = async (req, res) => {
       fullName,
       password: hashedPassword,
       phoneNumber
-    });
+    }).populate('groups');
 
     if(newUser){
       generateToken(newUser._id, res);
@@ -48,6 +48,7 @@ export const signup = async (req, res) => {
         fullName: newUser.fullName,
         phoneNumber: newUser.phoneNumber,
         profilePic: newUser.profilePic,
+        groups: newUser.groups,
         createdAt: newUser.createdAt,
       });
     }else{
@@ -62,7 +63,7 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   const {email, password} = req.body;
   try {
-    const existingUser = await user.findOne({email: email});
+    const existingUser = await user.findOne({email: email}).populate('groups');
     
     if(!existingUser) {
       return res.status(400).json({message: 'Invalid email or password'});
@@ -79,6 +80,7 @@ export const login = async (req, res) => {
         email: existingUser.email,
         fullName: existingUser.fullName,
         profilePic: existingUser.profilePic,
+        groups: existingUser.groups,
         createdAt: existingUser.createdAt
       });
     }

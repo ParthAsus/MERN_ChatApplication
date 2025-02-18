@@ -10,7 +10,7 @@ const messageSchema = mongoose.Schema(
     receiverId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
-      required: true
+      required: function() { return !this.groupId; },
     },
     text: {
       type: String
@@ -21,7 +21,7 @@ const messageSchema = mongoose.Schema(
     groupId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Group",
-      default: null // Nullable field for group messages
+      default: null
     }
   },
   {

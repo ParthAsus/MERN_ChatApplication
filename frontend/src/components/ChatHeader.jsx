@@ -7,8 +7,8 @@ import useOutsideAndEscapeHandlerHook from '../hooks/useOutsideAndEscapeHandlerH
 
 const ChatHeader = () => {
 
-  const {selectedUser, setSelectedUser} = useChatStore();
-  const {onlineUsers} = useAuthStore();
+  const { selectedUser, setSelectedUser} = useChatStore();
+  const { onlineUsers } = useAuthStore();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const profileModalRef = useRef(null);
 
@@ -18,20 +18,19 @@ const ChatHeader = () => {
     setShowProfileModal((prev) => !prev);
   }
 
-  console.log(selectedUser);
-  
+
   return (
     <div className="p-2.5 border-b border-base-300">
       <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3 relative">
+        <div className="flex items-center gap-3 relative">
           <div className="avatar relative" onClick={handleProfileModal}>
             <div className="size-10 rounded-full cursor-pointer">
-              <img src={selectedUser.profilePic || "/avatar.jpg"} alt={selectedUser.fullName || selectedUser.groupName} />
+              <img src={selectedUser.profilePic || selectedUser.groupProfilePic|| "/avatar.jpg"} alt={selectedUser.fullName || selectedUser.groupName} />
             </div>
 
             {showProfileModal && (
               <div className="absolute top-full left-0 mt-2 w-[360px] bg-white shadow-lg rounded-lg z-20">
-                <ProfileModal setShowProfileModal={setShowProfileModal} profileModalRef={profileModalRef}/>
+                <ProfileModal setShowProfileModal={setShowProfileModal} profileModalRef={profileModalRef} />
               </div>
             )}
           </div>
@@ -40,6 +39,7 @@ const ChatHeader = () => {
           <div>
             <h3 className="font-medium">{selectedUser.fullName || selectedUser.groupName}</h3>
             <p className="text-sm text-base-content/70">
+            {/* todo for groups */}
               {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
             </p>
           </div>
@@ -47,7 +47,7 @@ const ChatHeader = () => {
 
         {/* Close button */}
         <button onClick={() => setSelectedUser(null)}>
-          <X/>
+          <X />
         </button>
       </div>
     </div>

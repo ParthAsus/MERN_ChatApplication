@@ -84,8 +84,10 @@ export const useChatStore = create((set, get) => ({
 
   sendMessage: async (messageData) => {
     const {selectedUser, messages} = get();
+    const isGroup = selectedUser?.groupProfilePic;
+    const selectedChatId = isGroup ? selectedUser._id : selectedUser._id;
     try {
-      const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
+      const res = await axiosInstance.post(`/messages/send/${selectedChatId}`, messageData);
       set({messages: [...messages, res.data]});
     } catch (error) {
       toast.error(error.response.data.message);

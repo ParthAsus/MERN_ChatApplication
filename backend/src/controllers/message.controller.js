@@ -1,5 +1,6 @@
 import cloudinary from "../lib/cloudinary.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
+import Group from "../models/group.model.js";
 import Message from "../models/message.model.js";
 import user from "../models/user.model.js";
 
@@ -38,12 +39,22 @@ export const getMessages = async (req, res) => {
     const {id: userToChatId} = req.params;
     const myId = req.user._id;
 
-    const messages = await Message.find({
-      $or: [
-        {senderId: myId, receiverId: userToChatId},
-        {senderId: userToChatId, receiverId: myId},
-      ]
-    });
+    let messages;
+
+    const isGroup = await Group.findById(userToChatId);
+    if(isGroup){
+      messages = await Message.find({groupId: userToChatId}).populate({path: 'groupId', populate: {
+        path: 'members',
+      }});
+    }else{
+      messages = await Message.find({
+        $or: [
+          {senderId: myId, receiverId: userToChatId},
+          {senderId: userToChatId, receiverId: myId},
+        ]
+      });
+    }
+
     res.status(201).json(messages); 
   } catch (error) {
     console.log('Error in getMessaages: ', error);
@@ -63,14 +74,32 @@ export const sendMessage = async (req, res) => {
       imageUrl = uploadResponse.secure_url;
     }
 
-    const message = new Message({
-      senderId,
-      receiverId,
-      text,
-      image: imageUrl
-    })
+    let message;
 
-    await message.save();
+    const isGroup = await Group.findById(receiverId);
+
+    if(isGroup && !isGroup.members.includes(senderId)){
+      return res.status(403).json({error: "You are not a member of this group"});
+    }
+
+    if (isGroup) {
+      message = new Message({
+        senderId,
+        text,
+        image: imageUrl,
+        groupId: receiverId 
+      });
+      await message.save();
+    } else {
+      message = new Message({
+        senderId,
+        receiverId: receiverId, 
+        text,
+        image: imageUrl
+      });
+      await message.save();
+    }
+
 
     const receiverSocketId = getReceiverSocketId(receiverId);
     if(receiverSocketId){
