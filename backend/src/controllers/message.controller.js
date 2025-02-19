@@ -90,6 +90,8 @@ export const sendMessage = async (req, res) => {
         groupId: receiverId 
       });
       await message.save();
+
+      io.to(receiverId).emit("group-messages", message);
     } else {
       message = new Message({
         senderId,
@@ -103,7 +105,7 @@ export const sendMessage = async (req, res) => {
 
     const receiverSocketId = getReceiverSocketId(receiverId);
     if(receiverSocketId){
-      io.to(receiverSocketId).emit("message", message);
+      io.to(receiverSocketId).emit("single-user-messages", message);
     }
     res.status(201).json(message);
   } catch (error) {

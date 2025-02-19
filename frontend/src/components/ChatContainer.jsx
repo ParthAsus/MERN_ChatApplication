@@ -7,22 +7,27 @@ import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
 
 const ChatContainer = () => {
-  const { messages, isMessagesLoading, selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages} = useChatStore();
+  const { messages, isMessagesLoading, selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages, subscribeToGroupMessages, unsubscribeFromGroupMessages} = useChatStore();
   const {authUser} = useAuthStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
     getMessages(selectedUser._id);
     subscribeToMessages();
+    subscribeToGroupMessages();
 
-    return () => unsubscribeFromMessages();
-  }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+    return () => {
+      unsubscribeFromMessages();
+      unsubscribeFromGroupMessages();
+    }
+  }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages, subscribeToGroupMessages, unsubscribeFromGroupMessages]);
 
   useEffect(() => {
     if(messageEndRef.current && messages){
       messageEndRef.current.scrollIntoView({behavior: "smooth"});
     }
   }, [messages]);
+
 
   const getSenderProfilePic = (message) => {
     if(selectedUser.members){

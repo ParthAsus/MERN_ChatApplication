@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useChatStore } from '../store/useChatStore'
-import { ArrowLeft, NotebookPen, Search, Users } from 'lucide-react';
+import { ArrowLeft, Cross, NotebookPen, Search, Users, X } from 'lucide-react';
 import SidebarSkeleton from './skeletons/SidebarSkeleton';
 import { useAuthStore } from '../store/useAuthStore';
 import AddUserModel from './AddUserModel';
 
 const Sidebar = () => {
 
-  const { users, isUsersLoading, selectedUser, getUsers, setSelectedUser, searchUserThroughPhoneNumber, searchedUser, groups, isGroupsLoading, getGroups, createGroup} = useChatStore();
+  const { users, isUsersLoading, selectedUser, getUsers, setSelectedUser, searchUserThroughPhoneNumber, searchedUser, groups, isGroupsLoading, getGroups, createGroup } = useChatStore();
   const { onlineUsers, addContactInUser, authUser } = useAuthStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [phone, setPhone] = useState('');
@@ -24,7 +24,7 @@ const Sidebar = () => {
   }, [getUsers]);
 
   useEffect(() => {
-    if(authUser?.groups.length > 0) getGroups();
+    if (authUser?.groups.length > 0) getGroups();
   }, [authUser?.groups, getGroups]);
 
   function handleSearchUser(e) {
@@ -72,20 +72,18 @@ const Sidebar = () => {
   if (isUsersLoading) return <SidebarSkeleton />
   return (
     <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
-      <div className="border-b border-base-300 w-full p-5">
-        <div className="flex items-center gap-2">
-          <Users className="size-6" />
-          <span className="font-medium hidden lg:block">Contacts</span>
+      <div className="border-b border-base-300 w-full p-5 flex justify-between">
+        <div className="flex gap-2 btn btn-sm btn-primary min-h-0">
+          <Users className="size-5" />
+          {/* <span className="font-medium hidden lg:block">Contacts</span> */}
         </div>
-
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className=" p-2 rounded-md mx-4 my-3 relative"
+          className="relative"
         >
-          <NotebookPen />
+          <NotebookPen className='text-primary hover:opacity-70' />
         </button>
-
       </div>
 
       <div className="overflow-y-auto w-full py-3">
@@ -95,7 +93,7 @@ const Sidebar = () => {
             onClick={() => setSelectedUser(user)}
             className={`
               w-full p-3 flex items-center gap-3
-              hover:bg-base-300 transition-colors
+              hover:bg-base-300 transition-colors 
               ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}
             `}
           >
@@ -129,7 +127,7 @@ const Sidebar = () => {
             onClick={() => setSelectedUser(group)}
             className={`
               w-full p-3 flex items-center gap-3
-              hover:bg-base-300 transition-colors
+              hover:bg-base-300 transition-colors rounded-3xl
               ${searchedUser?._id === group._id ? "bg-base-300 ring-1 ring-base-300" : ""}
             `}
           >
@@ -161,20 +159,23 @@ const Sidebar = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
           <div className="bg-neutral p-6 rounded-md w-96">
-            <h2 className="text-xl font-semibold mb-4">
-              {isGroupMode && (
-                <button
-                  onClick={() => {
-                    setIsGroupMode(false);
-                    setPhone("");
-                    setSelectedUsers([]);
-                  }}
-                  className="mr-2"
-                >
-                  <ArrowLeft />
-                </button>
-              )}
-              {isGroupMode ? "Create New Group" : "New Chat"}
+            <h2 className="text-xl font-semibold mb-4 flex justify-between text-primary">
+              <div>
+                {isGroupMode && (
+                  <button
+                    onClick={() => {
+                      setIsGroupMode(false);
+                      setPhone("");
+                      setSelectedUsers([]);
+                    }}
+                    className="mr-2"
+                  >
+                    <ArrowLeft />
+                  </button>
+                )}
+                {isGroupMode ? "Create New Group" : "New Chat"}
+              </div>
+              <X className='text-primary hover:opacity-70 cursor-pointer' onClick={() => setIsModalOpen(false)} />
             </h2>
 
             {isGroupMode && selectedUserNames.length > 0 && (
@@ -184,16 +185,22 @@ const Sidebar = () => {
                 ))}
               </div>
             )}
-            <input
-              type="text"
-              placeholder="Enter phone number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full border p-2 rounded-md bg-neutral"
-            />
-            <button onClick={handleSearchUser} className="bg-primary text-neutral p-2 rounded-md mt-3 w-full hover:opacity-70">
+            <div className='flex relative items-center justify-center'>
+              <input
+                type="text"
+                placeholder="Enter phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full p-2 rounded-md border-t input input-bordered bg-base-100"
+              />
+
+              <Search className='absolute right-3 cursor-pointer hover:opacity-60 text-secondary' onClick={handleSearchUser} />
+            </div>
+
+            {/* <button onClick={handleSearchUser} className="bg-primary text-neutral p-2 rounded-md mt-3 w-full hover:opacity-70">
               Search
-            </button>
+            </button> */}
+
 
             {isUsersLoading && <p className="text-center mt-3">Searching...</p>}
 
@@ -217,13 +224,12 @@ const Sidebar = () => {
               </div>
             )}
 
-
-            {!searchedUser && <p className="text-center mt-3 ">Add now to chat with your friends...</p>}
-
             {!isGroupMode ? (
-              <button onClick={() => { setIsGroupMode(true); setPhone(""); }} className="w-full flex items-center gap-2 p-2 mt-3 text-gray-700 hover:bg-gray-100 rounded-md">
-                <Users size={18} />
-                New Group
+              <button onClick={() => { setIsGroupMode(true); setPhone(""); }} className="w-full flex items-center gap-4 p-2 mt-3 rounded-md hover:bg-base-100 hover:rounded-3xl">
+                <div className='btn btn-primary btn-sm btn-circle'>
+                <Users size={18} className='min-h-0'/>
+                </div>
+                <span className=''>New Group</span>
               </button>
             ) : (
               <>
@@ -249,9 +255,12 @@ const Sidebar = () => {
               </>
             )}
 
+
+            {!searchedUser && !isGroupMode && <p className="text-center mt-3 text-primary">Add now to chat with your friends...</p>}
+            {/* 
             <button onClick={() => setIsModalOpen(false)} className="bg-secondary text-neutral hover:opacity-70 mt-4 text-center py-2 w-full rounded-md">
               Close
-            </button>
+            </button> */}
           </div>
         </div>
       )}

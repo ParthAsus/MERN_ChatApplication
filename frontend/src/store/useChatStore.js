@@ -99,7 +99,7 @@ export const useChatStore = create((set, get) => ({
     if(!selectedUser) return;
 
     const socket = useAuthStore.getState().socket;
-    socket.on("message", (message) => {
+    socket.on("single-user-messages", (message) => {
       if(message.senderId !== selectedUser._id) return;
       set({
         messages: [...get().messages, message],
@@ -107,9 +107,35 @@ export const useChatStore = create((set, get) => ({
     })
   },
 
+  subscribeToGroupMessages: async () => {
+    const {selectedUser} = get();
+    const authUser = useAuthStore.getState().authUser;
+    const isGroup = selectedUser?.groupProfilePic;
+    const groupId = isGroup ? selectedUser._id : selectedUser._id;
+    if(!groupId || !authUser) return;
+
+    const socket = useAuthStore.getState().socket;
+    try {
+      socket.on("group-messages", (message) => {
+        if(message.groupId !== groupId) return;
+        set({
+          messages: [...get().messages, message],
+        });
+
+      });
+    } catch (error) {
+      toast.error(error.message);
+    }
+  },
+
+  unsubscribeFromGroupMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    socket.off("group-messages");
+  },
+
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
-    socket.off("message");
+    socket.off("single-user-messages");
   },
 
   getFetchGifs: async (query) => {

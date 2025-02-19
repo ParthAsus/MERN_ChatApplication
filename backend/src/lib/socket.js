@@ -25,6 +25,7 @@
 import { Server } from "socket.io"; 
 import http from "http";
 import express from "express";
+import Group from "../models/group.model.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -52,6 +53,12 @@ io.on("connection", (socket) => {
   if (userId) userSocketMap[userId] = socket.id;
 
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
+
+  Group.find({members: userId}).then((groups) => {
+    groups.forEach((group) => {
+      socket.join(group._id.toString());    
+    })
+  })
 
   socket.on("disconnect", () => {
     console.log("A user disconnected", socket.id);
