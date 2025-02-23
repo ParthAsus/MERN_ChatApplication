@@ -3,11 +3,10 @@ import { useChatStore } from '../store/useChatStore'
 import { ArrowLeft, Cross, NotebookPen, Search, Users, X } from 'lucide-react';
 import SidebarSkeleton from './skeletons/SidebarSkeleton';
 import { useAuthStore } from '../store/useAuthStore';
-import AddUserModel from './AddUserModel';
 
 const Sidebar = () => {
 
-  const { users, isUsersLoading, selectedUser, getUsers, setSelectedUser, searchUserThroughPhoneNumber, searchedUser, groups, isGroupsLoading, getGroups, createGroup } = useChatStore();
+  const { users, isUsersLoading, selectedUser, getUsers, setSelectedUser, searchUserThroughPhoneNumber, groups, isGroupsLoading, getGroups, createGroup, searchedUser } = useChatStore();
   const { onlineUsers, addContactInUser, authUser } = useAuthStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [phone, setPhone] = useState('');
@@ -27,10 +26,12 @@ const Sidebar = () => {
     if (authUser?.groups.length > 0) getGroups();
   }, [authUser?.groups, getGroups]);
 
-  function handleSearchUser(e) {
+  const handleSearchUser = (e)  => {
     searchUserThroughPhoneNumber(phone);
     setPhone("");
   }
+console.log(selectedUser);
+  console.log(groups);
 
   function handleAddContact(userId) {
     if (!userId) return;
@@ -84,6 +85,8 @@ const Sidebar = () => {
         >
           <NotebookPen className='text-primary hover:opacity-70' />
         </button>
+
+        {/* <AddUserModel /> */}
       </div>
 
       <div className="overflow-y-auto w-full py-3">
@@ -93,7 +96,7 @@ const Sidebar = () => {
             onClick={() => setSelectedUser(user)}
             className={`
               w-full p-3 flex items-center gap-3
-              hover:bg-base-300 transition-colors 
+               hover:bg-base-300 transition-colors rounded-3xl
               ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}
             `}
           >
@@ -111,7 +114,7 @@ const Sidebar = () => {
               )}
             </div>
 
-            {/* User info - only visible on larger screens */}
+
             <div className="hidden lg:block text-left min-w-0">
               <div className="font-medium truncate">{user.fullName}</div>
               <div className="text-sm text-zinc-400">
@@ -128,7 +131,7 @@ const Sidebar = () => {
             className={`
               w-full p-3 flex items-center gap-3
               hover:bg-base-300 transition-colors rounded-3xl
-              ${searchedUser?._id === group._id ? "bg-base-300 ring-1 ring-base-300" : ""}
+              ${selectedUser?._id === group._id ? "bg-base-300 ring-1 ring-base-300" : ""}
             `}
           >
             <div className="relative mx-auto lg:mx-0">
@@ -145,7 +148,6 @@ const Sidebar = () => {
               )}
             </div>
 
-            {/* User info - only visible on larger screens */}
             <div className="hidden lg:block text-left min-w-0">
               <div className="font-medium truncate">{group.groupName}</div>
               <div className="text-sm text-zinc-400">
@@ -196,10 +198,6 @@ const Sidebar = () => {
 
               <Search className='absolute right-3 cursor-pointer hover:opacity-60 text-secondary' onClick={handleSearchUser} />
             </div>
-
-            {/* <button onClick={handleSearchUser} className="bg-primary text-neutral p-2 rounded-md mt-3 w-full hover:opacity-70">
-              Search
-            </button> */}
 
 
             {isUsersLoading && <p className="text-center mt-3">Searching...</p>}
@@ -257,10 +255,7 @@ const Sidebar = () => {
 
 
             {!searchedUser && !isGroupMode && <p className="text-center mt-3 text-primary">Add now to chat with your friends...</p>}
-            {/* 
-            <button onClick={() => setIsModalOpen(false)} className="bg-secondary text-neutral hover:opacity-70 mt-4 text-center py-2 w-full rounded-md">
-              Close
-            </button> */}
+
           </div>
         </div>
       )}

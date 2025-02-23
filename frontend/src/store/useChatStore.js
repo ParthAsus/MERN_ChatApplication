@@ -57,7 +57,7 @@ export const useChatStore = create((set, get) => ({
   },
 
   searchUserThroughPhoneNumber: async (phone) => {
-    set({isUsersLoading: true, searchedUser: null});
+    set({isUsersLoading: true});
     try {
       const res = await axiosInstance.get(`/messages/search-user?phone=${phone}`)
       set({searchedUser: res.data});
