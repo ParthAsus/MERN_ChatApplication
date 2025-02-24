@@ -36,11 +36,15 @@ export const signup = async (req, res) => {
       fullName,
       password: hashedPassword,
       phoneNumber
-    }).populate('groups');
+    });
+
+    console.log(await newUser);
 
     if(newUser){
       generateToken(newUser._id, res);
       await newUser.save();
+
+      const populatedUser = await user.findById(newUser._id).populate('groups');
 
       res.status(201).json({
         _id: newUser._id,
@@ -48,7 +52,7 @@ export const signup = async (req, res) => {
         fullName: newUser.fullName,
         phoneNumber: newUser.phoneNumber,
         profilePic: newUser.profilePic,
-        groups: newUser.groups,
+        groups: populatedUser.groups,
         createdAt: newUser.createdAt,
       });
     }else{
