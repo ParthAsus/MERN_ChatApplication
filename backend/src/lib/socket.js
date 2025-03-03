@@ -1,28 +1,4 @@
-// import { Server } from "socket.io";
-// import http from 'http';
-// import express from 'express';
-
-// const app = express();
-// const server = http.createServer(app);
-
-// const io = new Server(server, {
-//   cors: {
-//     origin: ["http://localhost:5173"],
-//     credentials: true
-//   }
-// });
-
-// io.on("connection", (socket) => {
-//   console.log('A user connected', socket.id);
-
-//   socket.on("disconnect", () => {
-//     console.log('A user disconnected', socket.id);
-//   })
-// })
-
-// export {io, server, app};
-
-import { Server } from "socket.io"; 
+import { Server } from "socket.io";
 import http from "http";
 import express from "express";
 import Group from "../models/group.model.js";
@@ -40,7 +16,7 @@ const io = new Server(server, {
   },
 });
 
-export function getReceiverSocketId(userId){
+export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
 }
 
@@ -54,11 +30,24 @@ io.on("connection", (socket) => {
 
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-  Group.find({members: userId}).then((groups) => {
+  Group.find({ members: userId }).then((groups) => {
     groups.forEach((group) => {
-      socket.join(group._id.toString());    
-    })
-  })
+      socket.join(group._id.toString());
+    });
+  });
+
+  // WebRTC Signaling
+  socket.on("call-user", ({ to, offer }) => {
+    io.to(userSocketMap[to]).emit("incoming-call", { from: userId, offer });
+  });
+
+  socket.on("answer-call", ({ to, answer }) => {
+    io.to(userSocketMap[to]).emit("call-answered", { from: userId, answer });
+  });
+
+  socket.on("ice-candidate", ({ to, candidate }) => {
+    io.to(userSocketMap[to]).emit("ice-candidate", { from: userId, candidate });
+  });
 
   socket.on("disconnect", () => {
     console.log("A user disconnected", socket.id);

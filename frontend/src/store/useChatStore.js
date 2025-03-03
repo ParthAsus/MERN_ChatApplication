@@ -17,6 +17,11 @@ export const useChatStore = create((set, get) => ({
   groups: [],
   isGroupsLoading: false,
   isGroupCreating: false,
+  localStream: null,
+  remoteStream: null,
+  peerConnection: null,
+
+  
 
   getUsers: async () => {
     set({isUsersLoading: true});
