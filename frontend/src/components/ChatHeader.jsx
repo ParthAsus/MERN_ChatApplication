@@ -31,6 +31,7 @@ const ChatHeader = () => {
     socket.on('call-answered', async ({ answer }) => {
       console.log('Call answered with answer:', answer);
       await handleCallAnswered(answer);
+      setShowVideoCall(true);
     });
 
     return () => {
