@@ -53,6 +53,10 @@ const ChatContainer = () => {
     );
   }
 
+  const handleAcceptCall = () => {
+    acceptCall(selectedUser._id);
+  }
+
 
   return (
     <div className="flex-1 flex flex-col overflow-auto">
@@ -64,7 +68,7 @@ const ChatContainer = () => {
             <h2 className="text-lg font-bold">Incoming Call from {incomingCall.from}</h2>
             <div className="mt-4 flex justify-center space-x-4">
               <button
-                onClick={acceptCall}
+                onClick={handleAcceptCall()}
                 className="bg-green-500 text-white px-4 py-2 rounded-lg"
               >
                 Accept

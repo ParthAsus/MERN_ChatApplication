@@ -82,7 +82,7 @@ export const useMediaStore = create((set, get) => ({
     set({ incomingCall: { from, offer } });
   },
 
-  acceptCall: async () => {
+  acceptCall: async (userId) => {
     const socket = useAuthStore.getState().socket;
     const { incomingCall } = get();
     if (!incomingCall) return;
