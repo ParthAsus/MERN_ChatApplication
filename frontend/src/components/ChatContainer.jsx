@@ -32,6 +32,13 @@ const ChatContainer = () => {
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (incomingCall) {
+      handleIncomingCall(incomingCall);
+    }
+  }, [incomingCall, handleIncomingCall]);
+  
+
   const getSenderProfilePic = (message) => {
     if (selectedUser.members) {
       const sender = selectedUser.members.find(member => member._id === message.senderId);
