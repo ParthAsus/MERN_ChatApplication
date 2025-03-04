@@ -2,14 +2,33 @@
 import { useState, useEffect, useRef } from "react"
 import { Mic, MicOff, PhoneOff, Video, VideoOff } from "lucide-react"
 import { useMediaStore } from "../store/useMediaStore"
+import { useAuthStore } from "../store/useAuthStore"
 
 const VideoCallModal = ({ isOpen, onClose, caller = {}, isOutgoing = false }) => {
   const [isMuted, setIsMuted] = useState(false)
   const [isVideoOff, setIsVideoOff] = useState(false)
   const [timer, setTimer] = useState(0)
-  const { localStream, remoteStream, endCall } = useMediaStore();
+  const {socket} = useAuthStore();
+  const { localStream, remoteStream, endCall, handleICECandidate, peerConnection } = useMediaStore();
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+
+  useEffect(() => {
+  
+    socket.on('ice-candidate', async ({ candidate }) => {
+      try {
+        handleICECandidate(candidate)
+        console.log('Added ICE candidate.');
+      } catch (error) {
+        console.error('Error adding received ICE candidate', error);
+      }
+    });
+  
+    return () => {
+      socket.off('ice-candidate');
+    };
+  }, [peerConnection, socket]);
+  
   
   useEffect(() => {
     let interval;
@@ -21,6 +40,8 @@ const VideoCallModal = ({ isOpen, onClose, caller = {}, isOutgoing = false }) =>
     }
     return () => clearInterval(interval);
   }, [isOpen]);
+
+
 
   useEffect(() => {
     if (localStream && localVideoRef.current) {

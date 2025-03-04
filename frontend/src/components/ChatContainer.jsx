@@ -32,11 +32,6 @@ const ChatContainer = () => {
     }
   }, [messages]);
 
-  useEffect(() => {
-    if (incomingCall) {
-      handleIncomingCall(incomingCall);
-    }
-  }, [incomingCall, handleIncomingCall]);
   
 
   const getSenderProfilePic = (message) => {

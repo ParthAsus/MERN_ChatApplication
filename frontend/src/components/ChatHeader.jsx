@@ -16,7 +16,7 @@ const ChatHeader = () => {
   const profileModalRef = useRef(null);
   const [showVideoCall, setShowVideoCall] = useState(false)
   const [showVoiceCall, setShowVoiceCall] = useState(false)
-  const { startCall, acceptCall, rejectCall, incomingCall, setIncomingCall } = useMediaStore();
+  const { startCall, acceptCall, rejectCall, incomingCall, setIncomingCall, handleCallAnswered } = useMediaStore();
 
 
   useOutsideAndEscapeHandlerHook(profileModalRef, showProfileModal, setShowProfileModal);
@@ -28,9 +28,14 @@ const ChatHeader = () => {
       setIncomingCall(data);
     });
 
+    socket.on('call-answered', async ({ answer }) => {
+      console.log('Call answered with answer:', answer);
+      await handleCallAnswered(answer);
+    });
 
     return () => {
       socket.off("incoming-call");
+      socket.off('call-answered');
     };
   }, [socket]);
 
