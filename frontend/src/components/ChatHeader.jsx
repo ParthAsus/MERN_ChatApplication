@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import { useAuthStore } from '../store/useAuthStore';
 import { Mic, Phone, Video, X } from 'lucide-react';
 import ProfileModal from './ProfileModal';
 import useOutsideAndEscapeHandlerHook from '../hooks/useOutsideAndEscapeHandlerHook';
 import VideoCallModal from "./VideoCallModal"
-import VoiceCallModal from "./VoiceCallModal"
 import { useMediaStore } from '../store/useMediaStore';
 
 const ChatHeader = () => {
@@ -15,45 +14,22 @@ const ChatHeader = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const profileModalRef = useRef(null);
   const [showVideoCall, setShowVideoCall] = useState(false)
-  const [showVoiceCall, setShowVoiceCall] = useState(false)
-  const { startCall, acceptCall, rejectCall, incomingCall, setIncomingCall, handleCallAnswered } = useMediaStore();
+  const {startCall, getOffer, localStream} = useMediaStore();
 
 
   useOutsideAndEscapeHandlerHook(profileModalRef, showProfileModal, setShowProfileModal);
-
-  useEffect(() => {
-    if(!socket) return;
-    socket.on('incoming-call', (data) => {
-      console.log('Incoming call data: ', data);
-      setIncomingCall(data);
-    });
-
-    socket.on('call-answered', async ({ answer }) => {
-      console.log('Call answered with answer:', answer);
-      await handleCallAnswered(answer);
-      setShowVideoCall(true);
-    });
-
-    return () => {
-      socket.off("incoming-call");
-      socket.off('call-answered');
-    };
-  }, [socket]);
-
-
+  
   const handleProfileModal = () => {
     setShowProfileModal((prev) => !prev);
   }
 
-  const handleVideoCall = async () => {
-    startCall(selectedUser._id);
+  const handleVideoModal = useCallback(async() => {
+    await startCall();
+    const offer = await getOffer();
+    console.log(offer);
+    socket.emit('user:call', {to: selectedUser._id, offer});
     setShowVideoCall(true);
-    console.log(incomingCall);
-  };
-
-  const handleVoiceCall = async () => {
-    setShowVoiceCall(true);
-  };
+  }, [socket, startCall]);
 
   return (
     <>
@@ -83,12 +59,12 @@ const ChatHeader = () => {
           </div>
 
           <div className="flex gap-2">
-            <button className="p-2 rounded-full hover:bg-gray-200" onClick={handleVideoCall}>
-              <Video size={20} />
+            <button className="p-2 rounded-full hover:bg-gray-200" >
+              <Video size={20} onClick={handleVideoModal}/>
             </button>
-            <button className="p-2 rounded-full hover:bg-gray-200" onClick={handleVoiceCall}>
+            {/* <button className="p-2 rounded-full hover:bg-gray-200" onClick={handleVoiceCall}>
               <Phone size={20} />
-            </button>
+            </button> */}
           </div>
 
           {/* Close button */}
@@ -97,32 +73,35 @@ const ChatHeader = () => {
           </button>
         </div>
 
-        {incomingCall && (  
+        {/* {incomingCall && (  
           <div className="modal w-36 h-40s">
             <p>User is calling...</p>
             <button onClick={acceptCall}>Accept</button>
             <button onClick={rejectCall}>Reject</button>
           </div>
-        )}
+        )} */}
       </div>
 
       <VideoCallModal
         isOpen={showVideoCall}
         onClose={() => {
           setShowVideoCall(false);
-          setIncomingCall(null);
+          // setIncomingCall(null);
         }}
-        caller={incomingCall ? incomingCall.from : selectedUser}
-        isOutgoing={!incomingCall}
+        localStream={localStream}
+        setShowVideoCall={setShowVideoCall}
+        handleVideoModal={handleVideoModal}
+        // caller={incomingCall ? incomingCall.from : selectedUser}
+        // isOutgoing={!incomingCall}
       />
 
       {/* Voice Call Modal */}
-      <VoiceCallModal
+      {/* <VoiceCallModal
         isOpen={showVoiceCall}
         onClose={() => setShowVoiceCall(false)}
         caller={selectedUser}
         isOutgoing={true}
-      />
+      /> */}
     </>
   )
 }

@@ -37,16 +37,25 @@ io.on("connection", (socket) => {
   });
 
   // WebRTC Signaling
-  socket.on("call-user", ({ to, offer }) => {
-    io.to(userSocketMap[to]).emit("incoming-call", { from: userId, offer });
+
+  socket.on('user:call', (data) => {
+    const {to, offer} = data;
+    socket.to(userSocketMap[to]).emit('incoming:call', {from: userId, offer});
   });
 
-  socket.on("answer-call", ({ to, answer }) => {
-    io.to(userSocketMap[to]).emit("call-answered", { from: userId, answer });
+  socket.on('call:accepted', (data) => {
+    const {to, answer} = data;
+    socket.to(userSocketMap[to]).emit('call:accepted', {from: userId, answer});
   });
 
-  socket.on("ice-candidate", ({ to, candidate }) => {
-    io.to(userSocketMap[to]).emit("ice-candidate", { from: userId, candidate });
+  socket.on('peerConnection:nego:needed', (data) => {
+    const {to, offer} = data;
+    socket.to(userSocketMap[to]).emit('peerConnection:nego:incoming', {from: userId, offer});
+  });
+
+  socket.on('peerConnection:nego:acepted', (data) => {
+    const {to, answer} = data;
+    socket.to(userSocketMap[to]).emit('peerConnection:nego:completed', {from: userId, answer});
   });
 
   socket.on("disconnect", () => {

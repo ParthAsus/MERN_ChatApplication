@@ -5,14 +5,13 @@ import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
-import { useMediaStore } from "../store/useMediaStore";
-import VideoCallModal from "./VideoCallModal";
+// import { useMediaStore } from "../store/useMediaStore";
+// import VideoCallModal from "./VideoCallModal";
 
 const ChatContainer = () => {
   const { messages, isMessagesLoading, selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages, subscribeToGroupMessages, unsubscribeFromGroupMessages } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
-  const { incomingCall, handleIncomingCall, acceptCall, rejectCall } = useMediaStore();
 
 
   useEffect(() => {
@@ -53,15 +52,15 @@ const ChatContainer = () => {
     );
   }
 
-  const handleAcceptCall = () => {
-    acceptCall(selectedUser._id);
-  }
+  // const handleAcceptCall = () => {
+  //   acceptCall(selectedUser._id);
+  // }
 
 
   return (
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader />
-
+{/* 
       {incomingCall && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
@@ -82,7 +81,7 @@ const ChatContainer = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (

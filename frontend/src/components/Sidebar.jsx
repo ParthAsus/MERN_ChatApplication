@@ -30,8 +30,8 @@ const Sidebar = () => {
     searchUserThroughPhoneNumber(phone);
     setPhone("");
   }
-console.log(selectedUser);
-  console.log(groups);
+// console.log(selectedUser);
+//   console.log(groups);
 
   function handleAddContact(userId) {
     if (!userId) return;
