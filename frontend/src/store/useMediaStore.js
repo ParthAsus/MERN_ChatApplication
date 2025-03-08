@@ -6,6 +6,10 @@ export const useMediaStore = create((set, get) => ({
   remoteStream: null,
   peerConnection: null,
   incomingCall: null,
+  roomId: null,
+  isInRoom: false,
+  remoteUser: null,
+  remoteUserIsInRoom: false,
 
   startCall: async () => {
     try {
@@ -13,26 +17,30 @@ export const useMediaStore = create((set, get) => ({
         audio: true,
         video: true,
       });
-      set({ localStream: stream });
+
       const peerConnection = new RTCPeerConnection({
         iceServers: [
-          {
-            urls: [
-              "stun:stun.l.google.com:19302",
-              "stun:global.stun.twilio.com:3478",
-            ],
-          },
-        ],  
+          { urls: ["stun:stun.l.google.com:19302", "stun:global.stun.twilio.com:3478"] }
+        ],
       });
 
-      stream.getTracks().forEach((track) => {
+      peerConnection.ontrack = (event) => {
+        console.log("Received track event");
+        const [stream] = event.streams;
+        if (stream) {
+          set({ remoteStream: stream });
+        }
+      };
+
+      stream.getTracks().forEach(track => {
         peerConnection.addTrack(track, stream);
       });
 
-      set({peerConnection});
+      set({ peerConnection, localStream: stream });
+      return peerConnection;
     } catch (error) {
-      console.log('Error in Start Call', error);
-    };
+      console.error("Error in startCall:", error);
+    }
   },
 
   getOffer: async() => {
@@ -77,4 +85,24 @@ export const useMediaStore = create((set, get) => ({
   setLocalStream: (localStream) => set({localStream}),
   setRemoteStream: (remoteStream) => set({remoteStream}),
 
+  // Join a room (for both caller and receiver)
+  joinRoom: (roomId, remoteUser) => {
+    set({
+      roomId,
+      isInRoom: true,
+      remoteUser,
+      remoteUserIsInRoom: false
+    });
+  },
+
+  setRemoteUserIsInRoom: () => set({remoteUserIsInRoom: true}),
+
+  // Leave a room
+  leaveRoom: () => {
+    set({
+      roomId: null,
+      isInRoom: false,
+      remoteUser: null
+    });
+  }
 }));
